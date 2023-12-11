@@ -8,7 +8,7 @@ using static NeuralNetworks.MLP;
 namespace NeuralNetworks.Controllers
 {
     [ApiController]
-    [Route("/MLP")]
+    [Route("/MLPController")]
     public class MLPController : ControllerBase
     {
 
@@ -66,9 +66,6 @@ namespace NeuralNetworks.Controllers
             return "Predicted Value: "+ouput.Score.ToString();
         }
 
-        public void calculatePerformanceScores()
-        {
-
-        }
+       
     }
 }
