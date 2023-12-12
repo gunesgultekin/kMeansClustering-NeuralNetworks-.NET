@@ -1,9 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using Accord.Neuro;
+using Accord.Neuro.Learning;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
 using Microsoft.ML.Data;
+using NeuralNetworks.Data;
 using System.Globalization;
-using static NeuralNetworks.MLP;
+using Tensorflow;
+using Tensorflow.Keras;
+using Tensorflow.Keras.Layers;
+
 
 namespace NeuralNetworks.Controllers
 {
@@ -12,60 +18,208 @@ namespace NeuralNetworks.Controllers
     public class MLPController : ControllerBase
     {
 
+        private DatabaseContext _context;
 
-        [HttpGet("Predict")]
-        public string predict(string inputData)
+        public MLPController(DatabaseContext context)
         {
-            List<string> list;
-
-            string[] elements = inputData.Split(",");
-
-            ModelInput input = new ModelInput();
-
-            input.Theta1 = float.Parse(elements[0], CultureInfo.InvariantCulture);
-            input.Theta2 = float.Parse(elements[1], CultureInfo.InvariantCulture);
-            input.Theta3 = float.Parse(elements[2], CultureInfo.InvariantCulture);
-            input.Theta4 = float.Parse(elements[3], CultureInfo.InvariantCulture);
-            input.Theta5 = float.Parse(elements[4], CultureInfo.InvariantCulture);
-            input.Theta6 = float.Parse(elements[5], CultureInfo.InvariantCulture); 
-            
-            input.Thetad1= float.Parse(elements[6], CultureInfo.InvariantCulture);
-            input.Thetad2 = float.Parse(elements[7], CultureInfo.InvariantCulture);
-            input.Thetad3 = float.Parse(elements[8], CultureInfo.InvariantCulture);
-            input.Thetad4 = float.Parse(elements[9], CultureInfo.InvariantCulture);
-            input.Thetad5 = float.Parse(elements[10], CultureInfo.InvariantCulture);
-            input.Thetad6 = float.Parse(elements[11], CultureInfo.InvariantCulture);
-
-            input.Tau1 = float.Parse(elements[12], CultureInfo.InvariantCulture);
-            input.Tau2 = float.Parse(elements[13], CultureInfo.InvariantCulture);
-            input.Tau3 = float.Parse(elements[14], CultureInfo.InvariantCulture);
-            input.Tau4 = float.Parse(elements[15], CultureInfo.InvariantCulture);
-            input.Tau5 = float.Parse(elements[16], CultureInfo.InvariantCulture);
-
-            input.Dm1 = float.Parse(elements[17], CultureInfo.InvariantCulture);
-            input.Dm2 = float.Parse(elements[18], CultureInfo.InvariantCulture);
-            input.Dm3 = float.Parse(elements[19], CultureInfo.InvariantCulture);
-            input.Dm4 = float.Parse(elements[20], CultureInfo.InvariantCulture);
-            input.Dm5 = float.Parse(elements[21], CultureInfo.InvariantCulture);
-
-            input.Da1 = float.Parse(elements[22], CultureInfo.InvariantCulture);
-            input.Da2 = float.Parse(elements[23], CultureInfo.InvariantCulture);
-            input.Da3 = float.Parse(elements[24], CultureInfo.InvariantCulture);
-            input.Da4 = float.Parse(elements[25], CultureInfo.InvariantCulture);
-            input.Da5 = float.Parse(elements[26], CultureInfo.InvariantCulture);
-
-            input.Db1 = float.Parse(elements[27], CultureInfo.InvariantCulture);
-            input.Db2 = float.Parse(elements[28], CultureInfo.InvariantCulture);
-            input.Db3 = float.Parse(elements[29], CultureInfo.InvariantCulture);
-            input.Db4 = float.Parse(elements[30], CultureInfo.InvariantCulture);
-            input.Db5 = float.Parse(elements[31], CultureInfo.InvariantCulture);
-
-
-            ModelOutput ouput =  MLP.Predict(input);
-
-            return "Predicted Value: "+ouput.Score.ToString();
+             this._context = context;
         }
 
-       
+        [HttpGet("createMLPNeuralNetwork")]
+        public string createMLPNeuralNetwork(int hiddenLayerNumber,int epochNumber)
+        {
+           
+
+            List<part1_train> data = _context.part1_train.ToList();
+
+            double[][] trainingInputs = new double[data.Count()][];
+            double[][] outputs = new double[data.Count()][];
+
+            for (int i=0; i<data.Count();++i)
+            {
+                trainingInputs[i] = new double[]
+                {
+                    double.Parse(data[i].theta1,CultureInfo.InvariantCulture),
+                    double.Parse(data[i].theta2,CultureInfo.InvariantCulture),
+                    double.Parse(data[i].theta3,CultureInfo.InvariantCulture),
+                    double.Parse(data[i].theta4, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].theta5, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].theta6, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].thetad1, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].thetad2, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].thetad3, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].thetad4, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].thetad5, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].thetad6, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].tau1, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].tau2, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].tau3, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].tau4, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].tau5, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].dm1, CultureInfo.InvariantCulture  ),
+                    double.Parse(data[i].dm2, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].dm3, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].dm4, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].dm5, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].da1, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].da2, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].da3, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].da4, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].da5, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].db1, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].db2, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].db3, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].db4, CultureInfo.InvariantCulture),
+                    double.Parse(data[i].db5, CultureInfo.InvariantCulture),
+                };
+
+                outputs[i] = new double[]
+                {
+                    double.Parse(data[i].ANGLE_ACC_ARM, CultureInfo.InvariantCulture),
+
+
+                };
+
+            }
+            
+            ActivationNetwork network = new ActivationNetwork(
+                new BipolarSigmoidFunction(),
+                32, // input length
+                hiddenLayerNumber, // hidden layer num
+                1 // output length
+                );
+
+            BackPropagationLearning teacher = new BackPropagationLearning( network );
+
+            for (int i=0;i<epochNumber;++i)
+            {
+                teacher.RunEpoch(trainingInputs, outputs); // TEACH MLP 
+
+            }
+           
+
+            //double[] test = { 0.4,0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8, 0.4, 0.8 };
+            //double[] prediction = network.Compute(test);
+
+            // TRAINING PERFORMANCE SCORES
+
+            double trainingMAE = 0;
+            double trainingMSE = 0;
+            double trainingRMSE = 0;
+            double trainingRsquare = 0;
+
+
+            for (int i=0; i<trainingInputs.Count();++i)
+            {
+                double[] trainingPrediction = network.Compute(trainingInputs[i]);
+                trainingMAE += Math.Abs( trainingPrediction[0] - outputs[i][0]);
+                trainingMSE += Math.Pow( trainingPrediction[0] - outputs[i][0] , 2);
+            }
+
+            trainingMAE /= trainingInputs.Count();
+            trainingMSE /= trainingInputs.Count();
+            trainingRMSE = Math.Sqrt(trainingMSE);
+            trainingRsquare = 1 - ( trainingMSE / trainingMAE );
+
+
+
+            // TEST PERFORMANCE SCORES
+            List<part1_test> testData = _context.part1_test.ToList();
+
+            double[][] testInputs = new double[testData.Count()][];
+            double[][] testOutputs = new double[testData.Count()][];
+
+            for (int i = 0; i < testData.Count(); ++i)
+            {
+                testInputs[i] = new double[]
+                {
+                    double.Parse(testData[i].theta1,CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].theta2,CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].theta3,CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].theta4, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].theta5, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].theta6, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].thetad1, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].thetad2, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].thetad3, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].thetad4, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].thetad5, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].thetad6, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].tau1, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].tau2, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].tau3, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].tau4, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].tau5, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].dm1, CultureInfo.InvariantCulture  ),
+                    double.Parse(testData[i].dm2, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].dm3, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].dm4, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].dm5, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].da1, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].da2, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].da3, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].da4, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].da5, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].db1, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].db2, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].db3, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].db4, CultureInfo.InvariantCulture),
+                    double.Parse(testData[i].db5, CultureInfo.InvariantCulture),
+                };
+
+                testOutputs[i] = new double[]
+                {
+                    double.Parse(testData[i].ANGLE_ACC_ARM, CultureInfo.InvariantCulture),
+
+
+                };
+
+            }
+
+
+            double testMAE = 0;
+            double testMSE = 0;
+            double testRMSE = 0;
+            double testRsquare = 0;
+
+            
+            for (int i = 0; i < testInputs.Count(); ++i)
+            {
+                double[] testPrediction = network.Compute(testInputs[i]);
+                testMAE += Math.Abs(testPrediction[0] - testOutputs[i][0]);
+                testMSE += Math.Pow(testPrediction[0] - testOutputs[i][0], 2);
+            }
+
+            testMAE /= testInputs.Count();
+            testMSE /= testInputs.Count();
+            testRMSE = Math.Sqrt(testMSE);
+            testRsquare = 1 - ( testMSE / testMAE );
+
+
+
+
+            return 
+                "MLP Neural Network with " + hiddenLayerNumber + " hidden layers and " + epochNumber+" Epochs"
+                + "\n\n" +
+                "Train Results:\n" + 
+                "Training Data Count: " + trainingInputs.Count() + "\n" +
+                "MAE: " + trainingMAE + "\n" +
+                "MSE: " + trainingMSE + "\n" +
+                "RMSE: " + trainingRMSE + "\n" +
+                "R^2 (coefficient of determination): " + trainingRsquare + "\n" +
+                "\n\n" +
+                "Test Results: \n" +
+                "Test Data Count: " + testInputs.Count() + "\n" +
+                "MAE: " + testMAE + "\n" +
+                "MSE: " + testMSE + "\n" +
+                "RMSE: " + testRMSE + "\n" +
+                "R^2 (coefficient of determination): " + testRsquare;
+
+
+
+
+        }
+
+
     }
 }

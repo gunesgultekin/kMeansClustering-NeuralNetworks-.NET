@@ -27,11 +27,16 @@ namespace NeuralNetworks.Controllers
 
             string featuresColumnName = "Features";
 
+          
+
             var pipeline = mlContext.Transforms
                 .Concatenate(featuresColumnName, "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9")
                 .Append(mlContext.Clustering.Trainers.KMeans(featuresColumnName, numberOfClusters: k_Value));
 
             var model = pipeline.Fit(dataView);
+
+            
+
 
             // CREATE A BUFFER TO STORE CENTROID COORDINATES OF THE CLUSTERS
             VBuffer<float>[] centroids = default;

@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using NeuralNetworks.Data;
+
 namespace NeuralNetworks
 {
     public class Program
@@ -12,6 +15,9 @@ namespace NeuralNetworks
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
+
+            builder.Services.AddDbContext<DatabaseContext>(option=> option.UseSqlServer(connectionConfiguration.connectionString));
+
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
