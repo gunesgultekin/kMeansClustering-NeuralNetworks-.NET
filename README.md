@@ -16,6 +16,6 @@
 * Calculates performance scores ( MAE,MSE,RMSE,R-Square ) seperately for Training and Test phases
 * Reports the weight values in each neuron
 * Example response for a Neural Network with 3 Hidden Layers, 5 Neurons per Hidden Layer and 50 Training Epochs:
-* 
+  
 ![nn-performance-scores](https://github.com/gunesgultekin/kMeansClustering-NeuralNetworks-.NET/assets/126399958/ef3cb4f9-5c64-496a-9c8a-874ffc95ef92)
 ![nn-neuron-weights](https://github.com/gunesgultekin/kMeansClustering-NeuralNetworks-.NET/assets/126399958/1ec9e742-036a-448b-a3ea-fd449265d78e)
