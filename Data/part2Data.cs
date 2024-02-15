@@ -2,6 +2,7 @@
 
 namespace NeuralNetworks.Data
 {
+    // PART 2 DATA MAPPER FOR K-MEANS MODEL
     public class part2Data
     {
         [LoadColumn(0)]

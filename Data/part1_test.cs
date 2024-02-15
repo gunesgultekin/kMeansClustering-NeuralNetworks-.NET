@@ -1,5 +1,6 @@
 ﻿namespace NeuralNetworks.Data
 {
+    // ENTITY FRAMEWORK - PART 1 TEST DATA MAPPING
     public class part1_test
     {
         public string theta1 { get; set; }

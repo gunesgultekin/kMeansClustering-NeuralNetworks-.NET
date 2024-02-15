@@ -16,6 +16,7 @@ namespace NeuralNetworks
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
 
+            // ADD ENTITY FRAMEWORK CONFIGURATION
             builder.Services.AddDbContext<DatabaseContext>(option=> option.UseSqlServer(connectionConfiguration.connectionString));
 
             builder.Services.AddSwaggerGen();

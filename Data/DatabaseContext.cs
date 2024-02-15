@@ -3,6 +3,7 @@ using static Tensorflow.Keras.Engine.InputSpec;
 
 namespace NeuralNetworks.Data
 {
+    // DATABASE CONTEXT FOR ENTITY FRAMEWORK CONFIGURATION
     public class DatabaseContext : DbContext
     {
         private readonly IConfiguration config;

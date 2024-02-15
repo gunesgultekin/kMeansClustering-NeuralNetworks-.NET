@@ -1,8 +1,10 @@
 ﻿namespace NeuralNetworks.Data
 {
+    // DATABASE CONFIGURATION CLASS
+    // CHANGE CONNECTION STRING TO YOUR LOCAL DATABASE CONNECION STRING (MSSQL)
     public class connectionConfiguration
     {
-        public static string connectionString = "Data Source=GG\\SQLEXPRESS;Initial Catalog = 4350-MLP; Integrated Security = True; TrustServerCertificate=True";
+        public static string connectionString = "Data Source= (your pc username )\\SQLEXPRESS;Initial Catalog = (database name); Integrated Security = True; TrustServerCertificate=True";
 
     }
 }

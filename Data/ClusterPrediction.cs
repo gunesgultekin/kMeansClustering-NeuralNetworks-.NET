@@ -2,6 +2,7 @@
 
 namespace NeuralNetworks.Data
 {
+    // CLASS FOR CLUSTER PREDICTIONS (K-MEANS)
     public class ClusterPrediction
     {
         [ColumnName("PredictedLabel")]
@@ -9,7 +10,5 @@ namespace NeuralNetworks.Data
 
         [ColumnName("Score")]
         public float[]? Distances;
-
-
     }
 }
